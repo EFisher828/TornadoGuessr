@@ -339,15 +339,16 @@ button {
     flex-direction: row;
     justify-content: space-between;
     width: 100%;
+    margin-top: 2vh;
   }
 
   #submit-forecast-btn {
-      padding: 0.5vh 1.5vh;
-      font-size: 2vh;
+      padding: 1vh 1.5vh;
+      font-size: 2.5vh;
   }
 
   #close-map-btn {
-      padding: 0.5vh 1vh;
-      font-size: 2vh;
+      padding: 1vh 1.5vh;
+      font-size: 2.5vh;
   }
 }

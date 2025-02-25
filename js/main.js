@@ -510,7 +510,7 @@ async function generateTornadoDay() {
     let selectedDate;
 
     let attempts = 0;
-    const maxAttempts = 100;
+    const maxAttempts = 200;
     while (!valid && attempts < maxAttempts) {
         selectedDate = getRandomDate();
         if (!selectedDate) {
