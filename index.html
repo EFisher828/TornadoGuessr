@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storm Chaser Training</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css' rel='stylesheet' />
+    <script src='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js'></script>
+    <script src="https://unpkg.com/@turf/turf@7.1.0/turf.min.js"></script>
+    <script src="https://www.unpkg.com/@mapbox/mapbox-gl-draw@1.5.0/dist/mapbox-gl-draw.js"></script>
+    <link rel="stylesheet" href="https://www.unpkg.com/@mapbox/mapbox-gl-draw@1.5.0/dist/mapbox-gl-draw.css"/>
+</head>
+<body>
+    <div class="container">
+        <h1>TornadoGuessr</h1>
+        <p>Test your skills by analyzing random tornado days!</p>
+
+        <div id="controls">
+            <label for="difficulty">Difficulty:</label>
+            <select id="difficulty">
+                <option value="None">Random (Any Reports)</option>
+                <option value="Easy">Easy (10+ Reports)</option>
+                <option value="Normal" selected>Normal (2-9 Reports)</option>
+                <option value="Hard">Hard (1 Report)</option>
+            </select>
+            <button onclick="generateTornadoDay()">Generate Tornado Day</button>
+        </div>
+
+        <div id="prediction-section">
+            <button id="predict-btn" onclick="showPredictionMap()">Make a Prediction</button>
+            <div id="map-modal" class="modal">
+                <div id="map" class="map-content"></div>
+                <div class="map-instructions">
+                  <div class="map-subinfo">
+                    <p>Click a point on the map to make a prediction. If a tornado occurred within 100 miles of your guess, you'll receive credit for the tornado.</p>
+                    <p>For this particular day, <span id="guess-count"></span> guesses are necessary to accurately predict each observed tornado.</p>
+                  </div>
+                  <div class="map-buttons">
+                    <button id="close-map-btn" onclick="hidePredictionMap()">Back to Maps</button>
+                    <button id="submit-forecast-btn" onclick="submitForecast()">Submit Forecast</button>
+                  </div>
+                </div>
+                <div id="results-modal" class="modal results-modal">
+                <div class="results-content">
+                    <div id="results-text"></div>
+                    <button onclick="hideResultsModal()">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="large-map-container">
+            <button id="prev-btn" onclick="changeMap(-1)">◄</button>
+            <img id="large-map" src="" alt="Large weather map">
+            <button id="next-btn" onclick="changeMap(1)">►</button>
+        </div>
+        <div id="map-container" class="map-grid">
+            <!-- Smaller maps will be dynamically inserted here -->
+        </div>
+    </div>
+    <script src="./js/main.js"></script>
+</body>
+</html>
