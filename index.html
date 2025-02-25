@@ -14,8 +14,8 @@
 <body>
     <div class="container">
         <h1>TornadoGuessr</h1>
-        <p>Test your skills by analyzing random tornado days!</p>
-        <p>Yes, you could cheat by looking up the date, but what's the fun in that?</p>
+        <p class="intro-txt">Test your skills by analyzing random tornado days!</p>
+        <p class="intro-txt">Yes, you could cheat by looking up the date, but where's the fun in that?</p>
 
         <div id="controls">
             <label for="difficulty">Difficulty:</label>
@@ -25,11 +25,12 @@
                 <option value="Normal" selected>Normal (2-9 Reports)</option>
                 <option value="Hard">Hard (1 Report)</option>
             </select>
-            <button onclick="generateTornadoDay()">Generate Tornado Day</button>
+            <button onclick="generateTornadoDay()" id="generate-btn">Generate Tornado Day</button>
+            <button onclick="showPredictionMap()" id="predict-btn">Make a Prediction</button>
+
         </div>
 
         <div id="prediction-section">
-            <button id="predict-btn" onclick="showPredictionMap()">Make a Prediction</button>
             <div id="map-modal" class="modal">
                 <div id="map" class="map-content"></div>
                 <div class="map-instructions">

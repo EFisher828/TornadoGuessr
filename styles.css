@@ -3,6 +3,7 @@ body {
     background-color: #f0f4f8;
     margin: 0;
     padding: 20px;
+    box-sizing: border-box;
 }
 
 .container {
@@ -13,6 +14,7 @@ body {
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
 }
 
 h1 {
@@ -22,7 +24,6 @@ h1 {
 
 p {
     color: #7f8c8d;
-    font-size: 1.2em;
 }
 
 #controls {
@@ -36,16 +37,22 @@ select, button {
     border: 1px solid #ccc;
 }
 
+select {
+  margin-right: 10px;
+}
+
 button {
-    background-color: #3498db;
     color: white;
     border: none;
-    margin-left: 10px;
     cursor: pointer;
     transition: background-color 0.3s;
 }
 
-button:hover {
+#generate-btn {
+  background-color: #3498db;
+}
+
+#generate-btn:hover {
     background-color: #2980b9;
 }
 
@@ -111,7 +118,7 @@ button:hover {
     display: none;
 }
 
-#predict-btn {
+/* #predict-btn {
     background-color: #e74c3c;
     color: white;
     border: none;
@@ -120,6 +127,12 @@ button:hover {
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
+    box-sizing: border-box;
+} */
+
+#predict-btn {
+  margin-left: 10px;
+  background-color: #e74c3c;
 }
 
 #predict-btn:hover {
@@ -211,6 +224,7 @@ button:hover {
   gap: 1vh;
   flex-direction: column;
   max-width: 60vw;
+  font-size: 2.5vh;
 }
 
 .map-buttons {
@@ -257,4 +271,83 @@ button:hover {
 
 .results-text p {
   margin: 0.5vh 0;
+}
+
+.intro-txt {
+  font-size: 2.5vh;
+}
+
+@media screen and (max-width: 480px) {
+  #controls {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  #predict-btn {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  #generate-btn {
+    width: 100%;
+  }
+
+  select {
+    width: 100%;
+  }
+
+  #large-map {
+    width: 100%;
+  }
+
+  #prev-btn {
+      left: 0%;
+  }
+
+  #next-btn {
+      right: 0%;
+  }
+
+  .modal {
+    gap: 0;
+  }
+
+  .map-grid {
+    grid-template-columns: auto;
+  }
+
+  .map-instructions {
+    flex-direction: column;
+    text-align: center;
+    padding: 1vh;
+    width: 100%;
+    border-radius: 0;
+  }
+
+  .map-content {
+    width: 100%;
+    border-radius: 0;
+  }
+
+  .map-subinfo {
+    gap: 0.5vh;
+    max-width: 100%;
+  }
+
+  .map-buttons {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  #submit-forecast-btn {
+      padding: 0.5vh 1.5vh;
+      font-size: 2vh;
+  }
+
+  #close-map-btn {
+      padding: 0.5vh 1vh;
+      font-size: 2vh;
+  }
 }

@@ -545,7 +545,7 @@ async function generateTornadoDay() {
         const img = document.createElement('img');
         img.src = url;
         img.alt = `${map} map for ${dateStr}`;
-        // img.onerror = () => img.src = 'placeholder.png';
+        img.onerror = () => img.src = 'placeholder.png';
         mapContainer.appendChild(img);
     });
 
