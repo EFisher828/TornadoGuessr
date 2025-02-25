@@ -15,6 +15,7 @@
     <div class="container">
         <h1>TornadoGuessr</h1>
         <p>Test your skills by analyzing random tornado days!</p>
+        <p>Yes, you could cheat by looking up the date, but what's the fun in that?</p>
 
         <div id="controls">
             <label for="difficulty">Difficulty:</label>
@@ -33,8 +34,9 @@
                 <div id="map" class="map-content"></div>
                 <div class="map-instructions">
                   <div class="map-subinfo">
-                    <p>Click a point on the map to make a prediction. If a tornado occurred within 100 miles of your guess, you'll receive credit for the tornado.</p>
-                    <p>For this particular day, <span id="guess-count"></span> guesses are necessary to accurately predict each observed tornado.</p>
+                    <p>Click a point on the map to make a prediction. Concentric circles with 50, 100, and 150 mi radii will appear.</p>
+                    <p>A perfect score will be awarded if all tornado reports lie within a circle with 50 mi radius.</p>
+                    <p>For this particular day, you are allowed up to <span id="guess-count"></span> guesses.</p>
                   </div>
                   <div class="map-buttons">
                     <button id="close-map-btn" onclick="hidePredictionMap()">Back to Maps</button>

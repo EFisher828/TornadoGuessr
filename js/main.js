@@ -79,16 +79,55 @@ function showPredictionMap() {
                           }
                       });
 
-                      // Prediction sources and layers
                       map.addSource('prediction-points', {
                           type: 'geojson',
                           data: { type: 'FeatureCollection', features: [] }
                       });
 
-                      map.addSource('prediction-circles', {
+                      map.addSource('prediction-circles-50', {
                           type: 'geojson',
                           data: { type: 'FeatureCollection', features: [] }
                       });
+
+                      map.addSource('prediction-circles-100', {
+                          type: 'geojson',
+                          data: { type: 'FeatureCollection', features: [] }
+                      });
+
+                      map.addSource('prediction-circles-150', {
+                          type: 'geojson',
+                          data: { type: 'FeatureCollection', features: [] }
+                      });
+
+                      map.addLayer({
+                          id: 'prediction-circles-150-layer',
+                          type: 'fill',
+                          source: 'prediction-circles-150',
+                          paint: {
+                              'fill-color': '#FE5F20', // Orange
+                              'fill-opacity': 0.3
+                          }
+                      }, 'aeroway-runway');
+
+                      map.addLayer({
+                          id: 'prediction-circles-100-layer',
+                          type: 'fill',
+                          source: 'prediction-circles-100',
+                          paint: {
+                              'fill-color': '#F3B62B', // Yellow
+                              'fill-opacity': 0.3
+                          }
+                      }, 'aeroway-runway');
+
+                      map.addLayer({
+                          id: 'prediction-circles-50-layer',
+                          type: 'fill',
+                          source: 'prediction-circles-50',
+                          paint: {
+                              'fill-color': '#0E4DAD', // Blue
+                              'fill-opacity': 0.3
+                          }
+                      }, 'aeroway-runway');
 
                       map.addLayer({
                           id: 'prediction-points-layer',
@@ -98,21 +137,11 @@ function showPredictionMap() {
                               'circle-radius': 6,
                               'circle-color': '#000000'
                           }
-                      });
-
-                      map.addLayer({
-                          id: 'prediction-circles-layer',
-                          type: 'fill',
-                          source: 'prediction-circles',
-                          paint: {
-                              'fill-color': '#000000',
-                              'fill-opacity': 0.2
-                          }
-                      });
+                      }, 'aeroway-runway');
 
                       // Calculate minimum circles
                       const tornadoPoints = tornadoFeatures.map(f => f.geometry.coordinates);
-                      minCircles = calculateMinCircles(tornadoPoints, 100);
+                      minCircles = calculateMinCircles(tornadoPoints, 50);
                       window.tornadoData = tornadoFeatures; // Store for later
 
                       document.getElementById('guess-count').innerText = minCircles;
@@ -141,16 +170,42 @@ function showPredictionMap() {
                               geometry: { type: 'Point', coordinates: [coords.lng, coords.lat] },
                               id: userGuesses.length // Assign ID for tracking
                           };
-                          const circle = turf.circle([coords.lng, coords.lat], 100, { steps: 64, units: 'miles' });
+
+                          // 50-mi solid circle
+                          const circle50 = turf.circle([coords.lng, coords.lat], 50, { steps: 64, units: 'miles' });
+
+                          // 100-mi ring (100 mi outer, 50 mi inner)
+                          const circle100Outer = turf.circle([coords.lng, coords.lat], 100, { steps: 64, units: 'miles' });
+                          const circle100Inner = turf.circle([coords.lng, coords.lat], 50, { steps: 64, units: 'miles' });
+                          const circle100Ring = turf.polygon([
+                              circle100Outer.geometry.coordinates[0], // Outer ring
+                              circle100Inner.geometry.coordinates[0]  // Inner ring (hole)
+                          ]);
+
+                          // 150-mi ring (150 mi outer, 100 mi inner)
+                          const circle150Outer = turf.circle([coords.lng, coords.lat], 150, { steps: 64, units: 'miles' });
+                          const circle150Inner = turf.circle([coords.lng, coords.lat], 100, { steps: 64, units: 'miles' });
+                          const circle150Ring = turf.polygon([
+                              circle150Outer.geometry.coordinates[0], // Outer ring
+                              circle150Inner.geometry.coordinates[0]  // Inner ring (hole)
+                          ]);
 
                           userGuesses.push([coords.lng, coords.lat]);
                           const pointsData = map.getSource('prediction-points')._data;
                           pointsData.features.push(pointFeature);
                           map.getSource('prediction-points').setData(pointsData);
 
-                          const circlesData = map.getSource('prediction-circles')._data;
-                          circlesData.features.push(circle);
-                          map.getSource('prediction-circles').setData(circlesData);
+                          const circles50Data = map.getSource('prediction-circles-50')._data;
+                          circles50Data.features.push(circle50);
+                          map.getSource('prediction-circles-50').setData(circles50Data);
+
+                          const circles100Data = map.getSource('prediction-circles-100')._data;
+                          circles100Data.features.push(circle100Ring);
+                          map.getSource('prediction-circles-100').setData(circles100Data);
+
+                          const circles150Data = map.getSource('prediction-circles-150')._data;
+                          circles150Data.features.push(circle150Ring);
+                          map.getSource('prediction-circles-150').setData(circles150Data);
 
                           document.getElementById('submit-forecast-btn').style.display = 'block';
                       });
@@ -176,9 +231,27 @@ function showPredictionMap() {
                           pointsData.features[draggedPointIndex].geometry.coordinates = [coords.lng, coords.lat];
                           map.getSource('prediction-points').setData(pointsData);
 
-                          const circlesData = map.getSource('prediction-circles')._data;
-                          circlesData.features[draggedPointIndex] = turf.circle([coords.lng, coords.lat], 100, { steps: 64, units: 'miles' });
-                          map.getSource('prediction-circles').setData(circlesData);
+                          const circles50Data = map.getSource('prediction-circles-50')._data;
+                          circles50Data.features[draggedPointIndex] = turf.circle([coords.lng, coords.lat], 50, { steps: 64, units: 'miles' });
+                          map.getSource('prediction-circles-50').setData(circles50Data);
+
+                          const circles100Data = map.getSource('prediction-circles-100')._data;
+                          const circle100Outer = turf.circle([coords.lng, coords.lat], 100, { steps: 64, units: 'miles' });
+                          const circle100Inner = turf.circle([coords.lng, coords.lat], 50, { steps: 64, units: 'miles' });
+                          circles100Data.features[draggedPointIndex] = turf.polygon([
+                              circle100Outer.geometry.coordinates[0],
+                              circle100Inner.geometry.coordinates[0]
+                          ]);
+                          map.getSource('prediction-circles-100').setData(circles100Data);
+
+                          const circles150Data = map.getSource('prediction-circles-150')._data;
+                          const circle150Outer = turf.circle([coords.lng, coords.lat], 150, { steps: 64, units: 'miles' });
+                          const circle150Inner = turf.circle([coords.lng, coords.lat], 100, { steps: 64, units: 'miles' });
+                          circles150Data.features[draggedPointIndex] = turf.polygon([
+                              circle150Outer.geometry.coordinates[0],
+                              circle150Inner.geometry.coordinates[0]
+                          ]);
+                          map.getSource('prediction-circles-150').setData(circles150Data);
                       }
 
                       // Stop dragging
@@ -200,15 +273,18 @@ function showPredictionMap() {
 
         mapDiv.dataset.initialized = 'true'; // Mark as initialized
         window.predictionMap = map; // Store map globally for reuse
-    } else {
-        // Reset guesses and UI
-        userGuesses = [];
-        map.getSource('prediction-points').setData({ type: 'FeatureCollection', features: [] });
-        map.getSource('prediction-circles').setData({ type: 'FeatureCollection', features: [] });
-        map.getSource('tornadoes').setData({ type: 'FeatureCollection', features: [] });
-        // window.guessInfo.innerHTML = `Min circles needed: ${minCircles}<br>Guesses remaining: ${minCircles}`;
-        document.getElementById('submit-forecast-btn').style.display = 'none';
     }
+    // } else {
+    //     // Reset guesses and UI
+    //     userGuesses = [];
+    //     map.getSource('prediction-points').setData({ type: 'FeatureCollection', features: [] });
+    //     map.getSource('prediction-circles-50').setData({ type: 'FeatureCollection', features: [] });
+    //     map.getSource('prediction-circles-100').setData({ type: 'FeatureCollection', features: [] });
+    //     map.getSource('prediction-circles-150').setData({ type: 'FeatureCollection', features: [] });
+    //     map.getSource('tornadoes').setData({ type: 'FeatureCollection', features: [] });
+    //     // window.guessInfo.innerHTML = `Min circles needed: ${minCircles}<br>Guesses remaining: ${minCircles}`;
+    //     // document.getElementById('submit-forecast-btn').style.display = 'none';
+    // }
 }
 
 function submitForecast() {
@@ -222,35 +298,62 @@ function submitForecast() {
         features: tornadoFeatures
     });
 
-    // Check coverage
-    const coveredTornadoes = new Set();
+    // Calculate points for each tornado
+    const tornadoScores = new Map(); // Map to store max score per tornado index
     userGuesses.forEach(guess => {
         tornadoPoints.forEach((tornado, index) => {
-            if (turf.distance(tornado, guess, { units: 'miles' }) <= 100) {
-                coveredTornadoes.add(index);
+            const distance = turf.distance(tornado, guess, { units: 'miles' });
+            let score = 0;
+            if (distance <= 50) {
+                score = 3; // Within 50 mi radius
+            } else if (distance <= 100) {
+                score = 2; // Within 100 mi ring (50-100 mi)
+            } else if (distance <= 150) {
+                score = 1; // Within 150 mi ring (100-150 mi)
+            }
+
+            // Update max score for this tornado
+            if (score > (tornadoScores.get(index) || 0)) {
+                tornadoScores.set(index, score);
             }
         });
     });
 
+    // Sum total points and count covered tornadoes
+    let totalPoints = 0;
+    const coveredTornadoes = new Set();
+    tornadoScores.forEach((score, index) => {
+        if (score > 0) {
+            totalPoints += score;
+            coveredTornadoes.add(index);
+        }
+    });
+
     const totalTornadoes = tornadoPoints.length;
     const coveredCount = coveredTornadoes.size;
+    const percentage = parseInt((totalPoints / (totalTornadoes * 3)) * 100)
 
     // Determine result message
     let resultMessage;
-    if (coveredCount === 0) {
-        resultMessage = "❌ BUST ❌";
-    } else if (coveredCount < totalTornadoes) {
-        resultMessage = '🌪️ Not bad 🌪️';
+    if (percentage === 0) {
+        resultMessage = "BUST";
+    } else if (percentage < 50) {
+        resultMessage = 'Not Bad, Not Great';
+    } else if (percentage < 100) {
+        resultMessage = 'Nice Forecast';
     } else {
-        resultMessage = "🚨 Perfect chase 🚨";
+        resultMessage = "Perfect Forecast!";
     }
 
     // Build results text
     const resultText = `
         <h2>${resultMessage}</h2>
-        <p>You identified ${coveredCount} out of ${totalTornadoes} tornadoes.</p>
+        <p>Your Score: ${percentage}%</p>
+        <p>${totalPoints} / ${totalTornadoes * 3} Possible Points</p>
         <p>The day in question is ${formattedDate}</p>
     `;
+
+    // <p>Scoring: 3 pts (within 50 mi), 2 pts (50-100 mi), 1 pt (100-150 mi)</p>
 
     // Show results modal
     document.getElementById('results-text').innerHTML = resultText;
@@ -261,35 +364,60 @@ function hideResultsModal() {
     document.getElementById('results-modal').style.display = 'none';
 }
 
-// Greedy algorithm to calculate minimum number of 50-mile circles
+// Greedy algorithm to calculate minimum number of 100-mile circles
 function calculateMinCircles(points, radius) {
     if (points.length === 0) return 0;
 
     let uncovered = [...points];
     let circleCount = 0;
+    const usedCenters = [];
 
     while (uncovered.length > 0) {
-        // Find the point that covers the most uncovered points
         let bestCenter = null;
         let maxCovered = 0;
+        let bestCoveredIndices = [];
 
+        // Test each uncovered point as a center
         for (const candidate of uncovered) {
-            const covered = uncovered.filter(p =>
-                turf.distance(candidate, p, { units: 'miles' }) <= radius
-            ).length;
-            if (covered > maxCovered) {
-                maxCovered = covered;
+            const coveredIndices = uncovered.map((p, i) =>
+                turf.distance(candidate, p, { units: 'miles' }) <= radius ? i : -1
+            ).filter(i => i !== -1);
+            if (coveredIndices.length > maxCovered) {
+                maxCovered = coveredIndices.length;
                 bestCenter = candidate;
+                bestCoveredIndices = coveredIndices;
             }
         }
 
-        // Remove covered points
-        uncovered = uncovered.filter(p =>
-            turf.distance(bestCenter, p, { units: 'miles' }) > radius
-        );
+        // Test midpoints between pairs for potentially better coverage
+        for (let i = 0; i < uncovered.length; i++) {
+            for (let j = i + 1; j < uncovered.length; j++) {
+                const p1 = uncovered[i];
+                const p2 = uncovered[j];
+                const mid = [
+                    (p1[0] + p2[0]) / 2,
+                    (p1[1] + p2[1]) / 2
+                ];
+                const coveredIndices = uncovered.map((p, k) =>
+                    turf.distance(mid, p, { units: 'miles' }) <= radius ? k : -1
+                ).filter(k => k !== -1);
+                if (coveredIndices.length > maxCovered) {
+                    maxCovered = coveredIndices.length;
+                    bestCenter = mid;
+                    bestCoveredIndices = coveredIndices;
+                }
+            }
+        }
+
+        if (!bestCenter) break; // No more coverage possible
+
+        usedCenters.push(bestCenter);
+        uncovered = uncovered.filter((_, i) => !bestCoveredIndices.includes(i));
         circleCount++;
     }
 
+    // Optional: Log centers for debugging
+    console.log(`Centers used (${circleCount}):`, usedCenters);
     return circleCount;
 }
 
@@ -341,8 +469,6 @@ function formatDateReadable(date) {
         year: 'numeric'   // e.g., "2020"
     };
 
-    let test = new Intl.DateTimeFormat('en-US', options).format(date);
-    console.log(test)
     return new Intl.DateTimeFormat('en-US', options).format(date);
 }
 
@@ -384,7 +510,7 @@ async function generateTornadoDay() {
     let selectedDate;
 
     let attempts = 0;
-    const maxAttempts = 50;
+    const maxAttempts = 100;
     while (!valid && attempts < maxAttempts) {
         selectedDate = getRandomDate();
         if (!selectedDate) {
@@ -424,6 +550,23 @@ async function generateTornadoDay() {
     });
 
     currentMapIndex = 0;
+    document.getElementById('prediction-section').style.display = 'block';
     document.getElementById('large-map').src = mapUrls[currentMapIndex];
     document.getElementById('large-map-container').style.display = 'block'
+
+    // Reset the map state
+    const mapDiv = document.getElementById('map');
+    if (mapDiv.dataset.initialized) {
+        window.predictionMap.remove(); // Remove the existing map instance
+        delete mapDiv.dataset.initialized; // Clear initialization flag
+        delete window.predictionMap; // Remove global reference
+        delete window.tornadoData; // Clear stored tornado data
+        delete window.guessInfo; // Clear guess info control reference
+        userGuesses = []; // Reset guesses
+        document.getElementById('map-modal').style.display = 'none'; // Hide map modal if open
+        document.getElementById('results-modal').style.display = 'none'; // Hide results modal if open
+        document.getElementById('submit-forecast-btn').style.display = 'none'; // Hide submit button
+    }
 }
+
+generateTornadoDay()
